@@ -1,0 +1,43 @@
+
+services: 
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: myapp
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/myapp
+    networks:
+      - app-network
+
+  client:
+    build:
+      context: ./frontend
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:

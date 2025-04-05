@@ -1,0 +1,21 @@
+FROM node:18
+
+WORKDIR /app
+
+# Install yarn globally
+#RUN npm install -g yarn@1.22.19
+
+# Copy only package files first (better layer caching)
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+# Copy the rest of the app
+COPY . .
+
+# Vite uses this port
+EXPOSE 5173
+
+# Run the dev server
+CMD [ "yarn", "dev"]
+
